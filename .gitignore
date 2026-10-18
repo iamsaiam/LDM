@@ -2,6 +2,8 @@
 /cpp-engine/build/
 /cpp-engine/build-*/
 /build-local/
+/build*/
+/benchmarks/results/
 /CMakeFiles/
 /CMakeCache.txt
 /cmake_install.cmake
@@ -10,8 +12,12 @@
 # Python virtual environments and bytecode
 /backend/.venv/
 /backend/venv/
-/backend/__pycache__/
+__pycache__/
 *.py[cod]
+.DS_Store
+.env
+.env.*
+!.env.example
 
 # Partial downloads and resume state
 *.part

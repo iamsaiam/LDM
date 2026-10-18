@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a reproducible problem with LDM.
+labels: []
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: LDM commit/version, OS/architecture, browser and FFmpeg/ffprobe versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include expected and observed behavior. Use a public sample or generated fixture where possible.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots
+      description: Remove cookies, authorization headers, signed URLs and personal data before attaching evidence.

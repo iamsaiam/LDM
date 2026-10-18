@@ -115,9 +115,7 @@ connections can expire and require retrying.
 - Browser dashboard QA completed an actual selected 360p H.264/AAC HLS transfer
   into MKV; ffprobe verified the output resolution/codecs. Pause, Resume, Cancel
   and history were observed in the browser. Workspace screenshots:
-  [quality selection](../../artifacts/ldm-quality-selection.png),
-  [paused transfer](../../artifacts/ldm-paused-transfer.png) and
-  [final history](../../artifacts/ldm-final-history.png). These dashboard checks
+  [quality selection](docs/images/dashboard.png). These dashboard checks
   and Node fixtures do not verify an installed Chromium/Firefox extension.
 - Installed Chrome 155.0.8059.39, Chromium 151.0.7922.34 and Firefox 158.0 passed
   generated local media checks in fresh temporary profiles. These exercised real
@@ -154,8 +152,8 @@ connections can expire and require retrying.
 
   | Local 32 MiB fixture | 1 connection median | 8 connections median | Evidence |
   | --- | ---: | ---: | --- |
-  | Per-response 8 MiB/s cap | 7.82 MiB/s (4.091 s) | 53.74 MiB/s (0.595 s) | [report](benchmarks/results/per-response-8mib-backlog64/REPORT.md), [JSON](benchmarks/results/per-response-8mib-backlog64/results.json) |
-  | Uncapped loopback | 310.05 MiB/s (0.103 s) | 369.69 MiB/s (0.087 s) | [report](benchmarks/results/uncapped-backlog64/REPORT.md), [JSON](benchmarks/results/uncapped-backlog64/results.json) |
+  | Per-response 8 MiB/s cap | 7.82 MiB/s (4.091 s) | 53.74 MiB/s (0.595 s) | [report](docs/benchmarks/per-response-8mib-backlog64/REPORT.md), [JSON](docs/benchmarks/per-response-8mib-backlog64/results.json) |
+  | Uncapped loopback | 310.05 MiB/s (0.103 s) | 369.69 MiB/s (0.087 s) | [report](docs/benchmarks/uncapped-backlog64/REPORT.md), [JSON](docs/benchmarks/uncapped-backlog64/results.json) |
 
   Both revised runs used executable SHA-256
   `00db57609bd6409f5b47fcc4577b452a415320ad6868a3e7a2bc32975609f2ef`.

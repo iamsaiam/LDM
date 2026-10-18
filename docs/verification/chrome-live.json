@@ -1,0 +1,41 @@
+{
+  "browser": "Google Chrome",
+  "profile": "/tmp/ldm-chromium-profile-ht0o0t",
+  "checks": [
+    "native player/network discovery; captured Cookie/Referer; real direct download and SHA-256",
+    "actual popup loads completed transfer history",
+    "real overlay Pause/Resume/Cancel and cancelled output cleanup",
+    "actual HLS inspection, 180p/360p picker and selected 360p MKV+audio output",
+    "actual popup Audio only/MP3 conversion, accurate selection badges and completion notification API",
+    "actual MV3 worker termination/restart and popup history recovery"
+  ],
+  "errors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:37729/favicon.ico"
+    }
+  ],
+  "outputs": [
+    "protected (6).mp4",
+    "master (6).mkv",
+    "master (3).mp3"
+  ],
+  "version": "155.0.8059.39",
+  "testIsolation": "Fresh temporary profile; explicitly authorized sandbox exception for generated localhost fixtures only",
+  "installed": {
+    "id": "cdbfgpoipkiklpalmcajibagghbliahl"
+  },
+  "extensionId": "cdbfgpoipkiklpalmcajibagghbliahl",
+  "directDiscovery": [
+    {
+      "filename": "protected.mp4",
+      "source": "network",
+      "headerNames": [
+        "cookie",
+        "referer",
+        "user-agent"
+      ]
+    }
+  ],
+  "status": "passed"
+}

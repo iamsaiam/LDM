@@ -13,6 +13,8 @@ Media inspection, HLS/DASH and audio/video merging also require `ffmpeg` and
 Release builds require both helpers to enable TLS verification by default.
 The pinned helper build described below also preserves trust settings for nested
 HLS/DASH media and encryption keys.
+See the [helper guide](packaging/media-helper/README.md) for codec/TLS development
+packages; a distribution FFmpeg package may fail release qualification.
 To build and check all components, use CMake 3.16+, a C++20 compiler, libcurl
 development files, Python 3.9+, Node.js 18+, FFmpeg and ffprobe.
 
@@ -23,6 +25,10 @@ sudo apt install build-essential cmake libcurl4-openssl-dev python3 nodejs ffmpe
 # macOS, after Apple's Command Line Tools are installed
 brew install cmake ffmpeg node python
 
+# Build the pinned helper using the development dependencies in its guide:
+# packaging/media-helper/README.md
+python3 scripts/build_media_helper.py --download --output-dir media-helper-build --jobs 3
+export PATH="$PWD/media-helper-build/runtime/bin:$PATH"
 python3 scripts/check_dependencies.py
 ```
 

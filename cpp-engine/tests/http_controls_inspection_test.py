@@ -66,6 +66,13 @@ def main():
                          "if 'protocol=tls' in sys.argv: print('tls_verify (default true)'); raise SystemExit(0)\n"
                          f"print({metadata!r})\n", encoding="utf-8")
         probe.chmod(0o755)
+        # Inspection checks both helpers' TLS policy before probing. Keep this
+        # API fixture independent of a system FFmpeg installation or launcher.
+        helper = tools / "ffmpeg"
+        helper.write_text(f"#!{sys.executable}\nimport sys\n"
+                          "if 'protocol=tls' in sys.argv: print('tls_verify (default true)'); raise SystemExit(0)\n"
+                          "raise SystemExit('unexpected FFmpeg processing in API fixture')\n", encoding="utf-8")
+        helper.chmod(0o755)
         environment = os.environ.copy()
         environment["PATH"] = str(tools) + os.pathsep + environment.get("PATH", "")
         environment["LDM_DOWNLOAD_DIR"] = str(work / "default-downloads")

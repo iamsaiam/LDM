@@ -17,10 +17,10 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DIRECTORIES = ("cpp-engine", "desktop-ui", "extension", "backend", "packaging", "scripts", "benchmarks", ".github")
-SOURCE_FILES = ("LICENSE", "README.md", "PROGRESS.md", "RELEASE.md", ".gitignore")
+SOURCE_DIRECTORIES = ("cpp-engine", "desktop-ui", "extension", "backend", "packaging", "scripts", "benchmarks", "docs", ".github", ".vscode")
+SOURCE_FILES = ("LICENSE", "README.md", "PROGRESS.md", "RELEASE.md", "CONTRIBUTING.md", "CHANGELOG.md", "SECURITY.md", ".gitignore")
 EXCLUDED_COMPONENTS = {".git", ".venv", "venv", "node_modules", "__pycache__", "CMakeFiles", "Testing", "downloads", "dist", "artifacts", "results"}
-SOURCE_SUFFIXES = {".cpp", ".h", ".in", ".py", ".js", ".cjs", ".css", ".html", ".json", ".svg", ".webmanifest", ".md", ".yml", ".yaml", ".desktop", ".sh", ".txt", ".patch", ".icns"}
+SOURCE_SUFFIXES = {".cpp", ".h", ".in", ".py", ".js", ".cjs", ".css", ".html", ".json", ".svg", ".png", ".webmanifest", ".md", ".yml", ".yaml", ".desktop", ".sh", ".txt", ".patch", ".icns"}
 
 
 def source_paths():

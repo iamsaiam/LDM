@@ -2,7 +2,17 @@ name: Build and verify LDM
 
 on:
   push:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.vscode/**'
+      - '.github/ISSUE_TEMPLATE/**'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.vscode/**'
+      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
 
 permissions:
@@ -21,13 +31,13 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.13'
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '24'
           package-manager-cache: false
@@ -84,7 +94,7 @@ jobs:
           python3 benchmarks/local_http.py "$ldm_binary" --size-mib 16 --repetitions 1 --per-connection-mib 8 --output-dir benchmark-evidence
       - name: Package development artifacts
         run: python3 scripts/package_release.py --kind all --build-dir build-release --output-dir release-artifacts
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: ldm-development-${{ matrix.os }}
           path: |
@@ -96,7 +106,7 @@ jobs:
             media-helper-build/runtime/share/doc/ldm-media-helper/
           if-no-files-found: error
           retention-days: 14
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: failure()
         with:
           name: ldm-diagnostics-${{ matrix.os }}

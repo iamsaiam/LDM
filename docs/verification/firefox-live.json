@@ -1,0 +1,21 @@
+{
+  "browser": "Firefox",
+  "checks": [
+    "actual temporary Firefox add-on; player detection; Cookie/Referer direct transfer and SHA-256",
+    "actual overlay Pause/Resume/Cancel and output cleanup",
+    "real HLS quality/audio chooser and 360p MKV+audio output",
+    "actual popup Audio only/MP3 conversion and accurate selection badge",
+    "actual popup transfer history",
+    "actual Firefox extension reload and persistent history recovery"
+  ],
+  "outputs": [
+    "protected (5).mp4",
+    "master (5).mkv",
+    "master (2).mp3"
+  ],
+  "testIsolation": "Fresh temporary profile; loopback-only WebDriver with browser UI access for extension pages; content sandbox unchanged",
+  "version": "158.0",
+  "profile": "/tmp/ldm-firefox-check-hy5jfg9u/rust_mozprofile7pDTtB",
+  "extensionId": "ldm-media-downloader@localhost",
+  "status": "passed"
+}

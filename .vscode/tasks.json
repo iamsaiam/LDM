@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "LDM: Configure",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S",
+        "${workspaceFolder}/cpp-engine",
+        "-B",
+        "${workspaceFolder}/cpp-engine/build",
+        "-DCMAKE_BUILD_TYPE=Debug"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "LDM: Build",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceFolder}/cpp-engine/build",
+        "--parallel",
+        "2"
+      ],
+      "dependsOn": "LDM: Configure",
+      "dependsOrder": "sequence",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "LDM: Test",
+      "type": "shell",
+      "command": "ctest",
+      "args": [
+        "--test-dir",
+        "${workspaceFolder}/cpp-engine/build",
+        "--output-on-failure"
+      ],
+      "dependsOn": "LDM: Build",
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}

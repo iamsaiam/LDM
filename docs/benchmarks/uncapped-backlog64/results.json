@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "recorded_utc": "2026-10-17T11:02:26.867842+00:00",
+  "scope": "synthetic loopback, not an Internet or IDM/XDM benchmark",
+  "fixture": {
+    "revision": 2,
+    "request_queue_size": 64,
+    "handler_chunk_bytes": 65536,
+    "script_sha256": "cd155b32340240ec40addfc18f4f286a14bc6bf2135ec2b6f331ee7e953280b0"
+  },
+  "payload_bytes": 33554432,
+  "payload_sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+  "per_connection_mib_per_second": 0,
+  "repetitions": 3,
+  "executable_sha256": "00db57609bd6409f5b47fcc4577b452a415320ad6868a3e7a2bc32975609f2ef",
+  "environment": {
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "architecture": "x86_64",
+    "python": "3.14.4",
+    "cpu_count": 4
+  },
+  "comparison_tools": {
+    "xdman": "/usr/bin/xdman",
+    "xdm": null,
+    "idman": null
+  },
+  "trials": [
+    {
+      "repetition": 1,
+      "connections": 1,
+      "seconds": 0.1366569150000032,
+      "bytes": 33554432,
+      "mib_per_second": 234.16304985371028,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 2,
+        "range_requests": 2,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 1
+      }
+    },
+    {
+      "repetition": 1,
+      "connections": 8,
+      "seconds": 0.08655844699995896,
+      "bytes": 33554432,
+      "mib_per_second": 369.69239986497416,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 9,
+        "range_requests": 9,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 7
+      }
+    },
+    {
+      "repetition": 2,
+      "connections": 1,
+      "seconds": 0.10320762800000693,
+      "bytes": 33554432,
+      "mib_per_second": 310.054601778057,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 2,
+        "range_requests": 2,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 1
+      }
+    },
+    {
+      "repetition": 2,
+      "connections": 8,
+      "seconds": 0.08776063100003739,
+      "bytes": 33554432,
+      "mib_per_second": 364.62818960344947,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 9,
+        "range_requests": 9,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 8
+      }
+    },
+    {
+      "repetition": 3,
+      "connections": 1,
+      "seconds": 0.10105769000000464,
+      "bytes": 33554432,
+      "mib_per_second": 316.6508159843999,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 2,
+        "range_requests": 2,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 1
+      }
+    },
+    {
+      "repetition": 3,
+      "connections": 8,
+      "seconds": 0.08547634199999266,
+      "bytes": 33554432,
+      "mib_per_second": 374.37259540192713,
+      "sha256": "c5febe7f44faea048a51663faa8228bb80c76b606644caf5accc5c04b858fdf9",
+      "correct": true,
+      "source": {
+        "requests": 9,
+        "range_requests": 9,
+        "bytes_served": 33554433,
+        "active": 0,
+        "peak_active": 5
+      }
+    }
+  ],
+  "summary": [
+    {
+      "connections": 1,
+      "median_seconds": 0.10320762800000693,
+      "median_mib_per_second": 310.054601778057,
+      "all_correct": true
+    },
+    {
+      "connections": 8,
+      "median_seconds": 0.08655844699995896,
+      "median_mib_per_second": 369.69239986497416,
+      "all_correct": true
+    }
+  ]
+}

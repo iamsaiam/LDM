@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "LDM CMake",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "cppStandard": "c++20"
+        }
+    ],
+    "version": 4
+}

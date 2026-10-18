@@ -70,8 +70,8 @@ matched. Exact timings and individual trials remain in the linked evidence:
 
 | Fixture | 1 connection median | 8 connections median | Evidence |
 | --- | ---: | ---: | --- |
-| Per-response 8 MiB/s cap | 7.821185 MiB/s; 4.091452 s | 53.741040 MiB/s; 0.595448 s | [report](results/per-response-8mib-backlog64/REPORT.md), [JSON](results/per-response-8mib-backlog64/results.json) |
-| Uncapped loopback | 310.054602 MiB/s; 0.103208 s | 369.692400 MiB/s; 0.086558 s | [report](results/uncapped-backlog64/REPORT.md), [JSON](results/uncapped-backlog64/results.json) |
+| Per-response 8 MiB/s cap | 7.821185 MiB/s; 4.091452 s | 53.741040 MiB/s; 0.595448 s | [report](../docs/benchmarks/per-response-8mib-backlog64/REPORT.md), [JSON](../docs/benchmarks/per-response-8mib-backlog64/results.json) |
+| Uncapped loopback | 310.054602 MiB/s; 0.103208 s | 369.692400 MiB/s; 0.086558 s | [report](../docs/benchmarks/uncapped-backlog64/REPORT.md), [JSON](../docs/benchmarks/uncapped-backlog64/results.json) |
 
 Both revised runs used executable SHA-256
 `00db57609bd6409f5b47fcc4577b452a415320ad6868a3e7a2bc32975609f2ef`
@@ -83,8 +83,8 @@ The earlier run used executable
 `dc0babdbc68b6a2f576c39dae54c62a356592e1864706c514a5c7ea521668032`,
 so a comparison with those runs changes both fixture and application build.
 The numbers cannot isolate an engine optimization. These remain local synthetic
-measurements; no Internet or competitor speed claim follows from them. Generated
-reports are workspace/CI evidence and are excluded from source-only packaging.
+measurements; no Internet or competitor speed claim follows from them. Generated reports remain outside source packaging. The archived reports linked
+above are included under `docs/benchmarks/` so the published evidence is reviewable.
 
 ## Optional bounded remote HTTP measurement
 

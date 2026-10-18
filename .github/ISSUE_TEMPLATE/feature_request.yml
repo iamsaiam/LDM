@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an improvement to LDM.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the workflow and who it would help.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Include UI ideas or examples if useful.
+    validations:
+      required: true
