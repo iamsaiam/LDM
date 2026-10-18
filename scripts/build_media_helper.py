@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import platform
+import shlex
 import shutil
 import subprocess
 import tarfile
@@ -71,16 +72,29 @@ def main():
     configure = [str(tree / "configure"), f"--prefix={runtime}", "--extra-version=ldm-tls1", "--disable-autodetect",
         "--enable-gnutls", "--enable-libx264", "--enable-libmp3lame", "--enable-libopus", "--enable-libxml2",
         "--enable-gpl", "--disable-doc", "--disable-debug", "--disable-ffplay"]
-    if args.extra_cflags:
-        configure.append("--extra-cflags=" + args.extra_cflags)
-    if args.extra_ldflags:
-        configure.append("--extra-ldflags=" + args.extra_ldflags)
+    cflags = []
+    ldflags = []
+    # LAME has no pkg-config file. Apple Silicon's Homebrew prefix is outside
+    # Apple's default compiler search paths, unlike /usr/local on Intel Macs.
+    if platform.system() == "Darwin" and shutil.which("brew"):
+        lame_prefix = Path(subprocess.check_output(["brew", "--prefix", "lame"], text=True).strip())
+        cflags.append(f"-I{lame_prefix / 'include'}")
+        ldflags.append(f"-L{lame_prefix / 'lib'}")
+    cflags.extend(shlex.split(args.extra_cflags))
+    ldflags.extend(shlex.split(args.extra_ldflags))
+    if cflags:
+        configure.append("--extra-cflags=" + shlex.join(cflags))
+    if ldflags:
+        configure.append("--extra-ldflags=" + shlex.join(ldflags))
     commands = [("configure", configure), ("compile", ["make", "-j", str(args.jobs)]), ("install", ["make", "install"])]
     for name, command in commands:
         print(f"Running {name}; log: {output / (name + '.log')}", flush=True)
         with (output / f"{name}.log").open("w") as log:
             result = subprocess.run(command, cwd=tree, stdout=log, stderr=subprocess.STDOUT)
         if result.returncode:
+            details = tree / "ffbuild/config.log"
+            if name == "configure" and details.is_file():
+                shutil.copyfile(details, output / "configure-details.log")
             raise RuntimeError(f"{name} failed; see {name}.log")
     info = {"version": VERSION, "revision": "ldm-tls1", "platform": platform.system(), "architecture": platform.machine(),
         "source_url": SOURCE_URL, "source_sha256": SOURCE_SHA256,

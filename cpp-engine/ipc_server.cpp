@@ -780,7 +780,7 @@ bool send_http_event(int socket, const std::string& event_json) {
     if (result.ec != std::errc{}) {
         return false;
     }
-    const std::string chunk = std::string(length_buffer.data(), result.ptr - length_buffer.data())
+    const std::string chunk = std::string(length_buffer.data(), result.ptr)
         + "\r\n" + payload + "\r\n";
     return send_all(socket, chunk);
 }
@@ -1079,11 +1079,18 @@ void IpcServer::run() {
     }
 
     struct Worker {
-        std::unique_ptr<std::atomic<bool>> finished;
-        std::jthread thread;
+        std::atomic<bool> finished{false};
+        std::thread thread;
+
+        ~Worker() {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
     };
-    std::vector<Worker> workers;
     std::atomic<std::size_t> active_clients{0U};
+    // Keep client state alive until every worker has joined, including on errors.
+    std::vector<std::unique_ptr<Worker>> workers;
 
     while (true) {
         sockaddr_in client_address{};
@@ -1104,8 +1111,8 @@ void IpcServer::run() {
             throw;
         }
 
-        workers.erase(std::remove_if(workers.begin(), workers.end(), [](const Worker& worker) {
-            return worker.finished->load(std::memory_order_acquire);
+        workers.erase(std::remove_if(workers.begin(), workers.end(), [](const std::unique_ptr<Worker>& worker) {
+            return worker->finished.load(std::memory_order_acquire);
         }), workers.end());
 
         if (active_clients.fetch_add(1U, std::memory_order_relaxed) >= kMaximumActiveClients) {
@@ -1117,11 +1124,9 @@ void IpcServer::run() {
         }
 
         SocketHandle accepted_client(client_descriptor);
-        auto finished = std::make_unique<std::atomic<bool>>(false);
-        std::atomic<bool>* finished_pointer = finished.get();
-        Worker worker{
-            std::move(finished),
-            std::jthread([client_descriptor = accepted_client.get(), finished_pointer, &active_clients,
+        auto worker = std::make_unique<Worker>();
+        std::atomic<bool>* finished_pointer = &worker->finished;
+        worker->thread = std::thread([client_descriptor = accepted_client.get(), finished_pointer, &active_clients,
                 server_port = port_]() {
                 SocketHandle client(client_descriptor);
                 timeval timeout{};
@@ -1130,7 +1135,7 @@ void IpcServer::run() {
                 handle_client(client.get(), server_port);
                 active_clients.fetch_sub(1U, std::memory_order_relaxed);
                 finished_pointer->store(true, std::memory_order_release);
-            })};
+            });
         static_cast<void>(accepted_client.release());
         workers.push_back(std::move(worker));
     }
