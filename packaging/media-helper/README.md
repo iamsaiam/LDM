@@ -25,6 +25,10 @@ brew install pkgconf nasm gnutls x264 lame opus libxml2
 export PKG_CONFIG_PATH="$(brew --prefix libxml2)/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
 ```
 
+For the LDM engine on macOS, install `curl` with Homebrew and export
+`CURL_ROOT="$(brew --prefix curl)"` before CMake configuration. The release checks
+qualify that libcurl build, including process-specific CA bundle behavior.
+
 Run from the LDM source directory:
 
 ```sh

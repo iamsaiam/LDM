@@ -23,7 +23,8 @@ development files, Python 3.9+, Node.js 18+, FFmpeg and ffprobe.
 sudo apt install build-essential cmake libcurl4-openssl-dev python3 nodejs ffmpeg
 
 # macOS, after Apple's Command Line Tools are installed
-brew install cmake ffmpeg node python
+brew install cmake curl ffmpeg node python
+export CURL_ROOT="$(brew --prefix curl)"
 
 # Build the pinned helper using the development dependencies in its guide:
 # packaging/media-helper/README.md

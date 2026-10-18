@@ -50,8 +50,9 @@ sudo apt install build-essential cmake libcurl4-openssl-dev python3 nodejs \
 
 ```sh
 xcode-select --install
-brew install cmake node python pkgconf nasm gnutls x264 lame opus libxml2
+brew install cmake curl node python pkgconf nasm gnutls x264 lame opus libxml2
 export PKG_CONFIG_PATH="$(brew --prefix libxml2)/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+export CURL_ROOT="$(brew --prefix curl)"
 ```
 
 ### 2. Build the media helpers

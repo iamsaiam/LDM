@@ -49,8 +49,9 @@ jobs:
       - name: macOS dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install cmake ffmpeg pkgconf nasm gnutls x264 lame opus libxml2
+          brew install cmake curl ffmpeg pkgconf nasm gnutls x264 lame opus libxml2
           echo "PKG_CONFIG_PATH=$(brew --prefix libxml2)/lib/pkgconfig:${PKG_CONFIG_PATH:-}" >> "$GITHUB_ENV"
+          echo "CURL_ROOT=$(brew --prefix curl)" >> "$GITHUB_ENV"
       - name: Build pinned media helper with inherited TLS trust
         run: |
           python3 scripts/build_media_helper.py --download --output-dir media-helper-build --jobs 3

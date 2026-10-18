@@ -53,12 +53,14 @@ namespace {
 
 constexpr std::size_t kChunkBufferSize = 64U * 1024U;
 
-void share_lock_callback(CURL*, curl_lock_data, curl_lock_access, void* user_data) {
-    static_cast<std::mutex*>(user_data)->lock();
+using CurlShareLocks = std::array<std::mutex, static_cast<std::size_t>(CURL_LOCK_DATA_LAST)>;
+
+void share_lock_callback(CURL*, curl_lock_data kind, curl_lock_access, void* user_data) {
+    (*static_cast<CurlShareLocks*>(user_data))[static_cast<std::size_t>(kind)].lock();
 }
 
-void share_unlock_callback(CURL*, curl_lock_data, void* user_data) {
-    static_cast<std::mutex*>(user_data)->unlock();
+void share_unlock_callback(CURL*, curl_lock_data kind, void* user_data) {
+    (*static_cast<CurlShareLocks*>(user_data))[static_cast<std::size_t>(kind)].unlock();
 }
 
 class SharedCookieStore {
@@ -69,7 +71,7 @@ public:
         }
         if (curl_share_setopt(share_, CURLSHOPT_LOCKFUNC, &share_lock_callback) != CURLSHE_OK
             || curl_share_setopt(share_, CURLSHOPT_UNLOCKFUNC, &share_unlock_callback) != CURLSHE_OK
-            || curl_share_setopt(share_, CURLSHOPT_USERDATA, &mutex_) != CURLSHE_OK
+            || curl_share_setopt(share_, CURLSHOPT_USERDATA, &locks_) != CURLSHE_OK
             || curl_share_setopt(share_, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE) != CURLSHE_OK) {
             curl_share_cleanup(share_);
             share_ = nullptr;
@@ -92,7 +94,9 @@ public:
 
 private:
     CURLSH* share_;
-    std::mutex mutex_;
+    // libcurl can lock the share and then its cookies; each kind needs its own
+    // mutex to avoid self-deadlock on older/native libcurl implementations.
+    CurlShareLocks locks_;
 };
 
 void initialize_curl() {

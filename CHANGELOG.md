@@ -21,5 +21,7 @@
 - Keep displayed quality/format labels aligned with selected media tracks.
 - Join IPC client threads using APIs supported by Apple's C++ standard library.
 - Locate the Homebrew LAME headers and library on Apple Silicon.
+- Give each libcurl shared-data category its own lock, preserving nested share
+  and cookie locking on native libcurl versions.
 
 See [verification](docs/VERIFICATION.md) for the evidence behind release claims.
