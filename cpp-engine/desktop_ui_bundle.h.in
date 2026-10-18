@@ -1,0 +1,32 @@
+#pragma once
+
+#include <string_view>
+
+namespace ldm::desktop_ui {
+
+inline constexpr std::string_view kIndexHtml = R"LDMIHTML(
+@LDM_UI_INDEX_HTML@
+)LDMIHTML";
+inline constexpr std::string_view kAppCss = R"LDMICSS(
+@LDM_UI_APP_CSS@
+)LDMICSS";
+inline constexpr std::string_view kAppJs = R"LDMIJS(
+@LDM_UI_APP_JS@
+)LDMIJS";
+inline constexpr std::string_view kTransferMetricsJs = R"LDMMETRICS(
+@LDM_UI_TRANSFER_METRICS_JS@
+)LDMMETRICS";
+inline constexpr std::string_view kMediaOptionsJs = R"LDMMOPTIONS(
+@LDM_UI_MEDIA_OPTIONS_JS@
+)LDMMOPTIONS";
+inline constexpr std::string_view kManifest = R"LDMIMAN(
+@LDM_UI_MANIFEST@
+)LDMIMAN";
+inline constexpr std::string_view kServiceWorker = R"LDMISW(
+@LDM_UI_SERVICE_WORKER@
+)LDMISW";
+inline constexpr std::string_view kIconSvg = R"LDMICON(
+@LDM_UI_ICON_SVG@
+)LDMICON";
+
+}  // namespace ldm::desktop_ui

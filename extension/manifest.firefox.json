@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "LDM Media Downloader",
+  "version": "1.0.0",
+  "description": "Detect media requests and send download tasks to the local LDM engine.",
+  "permissions": [
+    "alarms",
+    "cookies",
+    "notifications",
+    "storage",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://127.0.0.1:12345/*",
+    "http://localhost:12345/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "transfer-metrics.js",
+        "media-sources.js",
+        "media-options.js",
+        "content.js"
+      ],
+      "css": [
+        "overlay.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "overlay.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "action": {
+    "default_title": "LDM Media Downloader",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ldm-media-downloader@localhost",
+      "strict_min_version": "121.0"
+    }
+  }
+}

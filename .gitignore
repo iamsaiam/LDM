@@ -1,0 +1,26 @@
+# CMake build output
+/cpp-engine/build/
+/cpp-engine/build-*/
+/build-local/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+
+# Python virtual environments and bytecode
+/backend/.venv/
+/backend/venv/
+/backend/__pycache__/
+*.py[cod]
+
+# Partial downloads and resume state
+*.part
+*.ldmstate
+*.ldmchunk.*
+
+
+# Native CI and pinned helper build output
+media-helper-build/
+release-artifacts/
+install-evidence/
+benchmark-evidence/

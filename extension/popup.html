@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LDM Media Downloader</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <header class="header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 3.5v10m0 0 4-4m-4 4-4-4M5 15.5v2.25A2.25 2.25 0 0 0 7.25 20h9.5A2.25 2.25 0 0 0 19 17.75V15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div>
+          <p class="eyebrow">LOCAL DOWNLOAD MANAGER</p>
+          <h1>Stream library</h1>
+        </div>
+      </div>
+      <button id="refresh" class="icon-button" type="button" aria-label="Refresh streams" title="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 11a8 8 0 0 0-14.7-3.8L4 9m0-4v4h4m-4 4a8 8 0 0 0 14.7 3.8L20 15m0 4v-4h-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </header>
+    <main>
+      <section class="page-context" aria-label="Current page">
+        <p class="section-label">DETECTED ON THIS PAGE</p>
+        <p id="page-title" class="page-title">Checking this tab…</p>
+      </section>
+      <section id="status" class="status" role="status" aria-live="polite"></section>
+      <section id="streams" class="streams" aria-label="Detected media streams"></section>
+      <section class="transfers-section" aria-labelledby="transfers-title">
+        <header class="section-heading">
+          <div>
+            <p class="section-label">QUEUE &amp; HISTORY</p>
+            <h2 id="transfers-title">Downloads</h2>
+          </div>
+          <div class="transfer-actions">
+            <span id="transfer-count" class="transfer-count">0</span>
+            <button id="clear-history" class="text-button" type="button" disabled>Clear finished</button>
+          </div>
+        </header>
+        <div id="transfers" class="transfers">
+          <p class="empty-transfers">No downloads yet. Detected streams will appear above.</p>
+        </div>
+      </section>
+      <p class="privacy-note">
+        <span class="privacy-dot" aria-hidden="true"></span>
+        Request headers are sent only to your local LDM service when you inspect or download.
+      </p>
+    </main>
+    <script src="transfer-metrics.js"></script>
+    <script src="media-options.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

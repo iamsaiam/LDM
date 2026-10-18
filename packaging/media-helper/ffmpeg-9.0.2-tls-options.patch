@@ -1,0 +1,33 @@
+--- a/libavformat/aviobuf.c
++++ b/libavformat/aviobuf.c
+@@ -994,7 +994,7 @@
+ int ffio_copy_url_options(AVIOContext* pb, AVDictionary** avio_opts)
+ {
+     const char *opts[] = {
+-        "headers", "user_agent", "cookies", "http_proxy", "referer", "rw_timeout", "icy", NULL };
++        "headers", "user_agent", "cookies", "http_proxy", "referer", "rw_timeout", "icy", "ca_file", "tls_verify", NULL };
+     const char **opt = opts;
+     uint8_t *buf = NULL;
+     int ret = 0;
+--- a/libavformat/http.c
++++ b/libavformat/http.c
+@@ -2221,12 +2221,19 @@
+     return ffurl_get_short_seek(s->hd);
+ }
+ 
++static void *http_child_next(void *obj, void *prev)
++{
++    HTTPContext *s = obj;
++    return prev ? NULL : s->hd;
++}
++
+ #define HTTP_CLASS(flavor)                          \
+ static const AVClass flavor ## _context_class = {   \
+     .class_name = # flavor,                         \
+     .item_name  = av_default_item_name,             \
+     .option     = http_options,                     \
+     .version    = LIBAVUTIL_VERSION_INT,            \
++    .child_next = http_child_next,                  \
+ }
+ 
+ #if CONFIG_HTTP_PROTOCOL

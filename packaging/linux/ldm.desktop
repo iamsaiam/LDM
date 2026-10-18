@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=LDM Download Manager
+GenericName=Download Manager
+Comment=Download files and media with LDM
+Exec=ldm-downloader --app
+Icon=ldm
+Terminal=false
+Categories=Network;FileTransfer;
+StartupNotify=true

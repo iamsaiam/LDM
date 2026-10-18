@@ -1,0 +1,108 @@
+name: Build and verify LDM
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    name: Native ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, macos-15-intel]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libcurl4-openssl-dev ffmpeg pkg-config nasm libgnutls28-dev libx264-dev libmp3lame-dev libopus-dev libxml2-dev
+      - name: macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ffmpeg pkgconf nasm gnutls x264 lame opus libxml2
+          echo "PKG_CONFIG_PATH=$(brew --prefix libxml2)/lib/pkgconfig:${PKG_CONFIG_PATH:-}" >> "$GITHUB_ENV"
+      - name: Build pinned media helper with inherited TLS trust
+        run: |
+          python3 scripts/build_media_helper.py --download --output-dir media-helper-build --jobs 3
+          echo "$GITHUB_WORKSPACE/media-helper-build/runtime/bin" >> "$GITHUB_PATH"
+      - name: Check prerequisites
+        run: python3 scripts/check_dependencies.py --json
+      - name: Configure native Release build
+        run: cmake -S cpp-engine -B build-release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DLDM_REQUIRE_VERIFIED_MEDIA_TLS=ON
+      - name: Compile
+        run: cmake --build build-release --parallel 3
+      - name: Engine and local HTTP checks
+        run: ctest --test-dir build-release --output-on-failure
+      - name: All browser and dashboard regression checks
+        run: node --test extension/tests/*.test.cjs desktop-ui/tests/*.test.cjs
+      - name: Execute a fresh native installation
+        env:
+          LDM_INSTALL_PREFIX: ${{ runner.temp }}/ldm-clean-install
+        run: python3 scripts/check_native_install.py --build-dir build-release --prefix "$LDM_INSTALL_PREFIX" --report install-evidence/native-install.json
+      - name: Strict media TLS qualification
+        env:
+          LDM_REQUIRE_VERIFIED_MEDIA_TLS: '1'
+        run: |
+          ctest --test-dir build-release --output-on-failure -R tls-download-trust
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('media-helper-build/runtime/BUILD-INFO.json')
+          info = json.loads(path.read_text())
+          info['media_tls_qualified'] = True
+          info['qualified'] = True
+          path.write_text(json.dumps(info, indent=2) + '\n')
+          PY
+      - name: Small synthetic benchmark with hash checks
+        env:
+          RUNNER_OS_NAME: ${{ runner.os }}
+        run: |
+          ldm_binary=build-release/ldm-downloader
+          if [[ "$RUNNER_OS_NAME" == macOS ]]; then
+            ldm_binary=build-release/LDM.app/Contents/MacOS/LDM
+          fi
+          python3 benchmarks/local_http.py "$ldm_binary" --size-mib 16 --repetitions 1 --per-connection-mib 8 --output-dir benchmark-evidence
+      - name: Package development artifacts
+        run: python3 scripts/package_release.py --kind all --build-dir build-release --output-dir release-artifacts
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ldm-development-${{ matrix.os }}
+          path: |
+            release-artifacts/
+            benchmark-evidence/
+            install-evidence/
+            media-helper-build/runtime/BUILD-INFO.json
+            media-helper-build/runtime/bin/
+            media-helper-build/runtime/share/doc/ldm-media-helper/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: ldm-diagnostics-${{ matrix.os }}
+          path: |
+            build-release/Testing/Temporary/
+            media-helper-build/*.log
+            install-evidence/
+          if-no-files-found: ignore
+          retention-days: 7

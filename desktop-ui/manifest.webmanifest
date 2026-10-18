@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "LDM Download Manager",
+  "short_name": "LDM",
+  "description": "A fast, private download manager for Linux and macOS.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#101a2d",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

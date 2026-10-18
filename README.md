@@ -132,6 +132,9 @@ On Linux, open the dashboard or run only the service for the browser extension:
 
 On macOS, use `./build-release/LDM.app/Contents/MacOS/LDM` with the same arguments,
 or open the installed app. The default service address is `127.0.0.1:12345`.
+Set `LDM_DOWNLOAD_DIR=/absolute/folder` on the engine process to choose its default
+browser-download folder. Otherwise bare filenames use the user's Downloads folder.
+An invalid relative configured folder is rejected.
 
 For a direct command-line file transfer:
 
@@ -170,12 +173,12 @@ replaces libcurl's default CA bundle and is passed to the top-level HTTPS media
 helper. This is process configuration, not a field supplied by browser pages.
 It does not disable certificate or hostname checks for native HTTPS/FTPS.
 
-FFmpeg 8.0.1 does not propagate the parent's TLS settings to every
-HLS segment: an isolated wrong-host segment was accepted during the audit. That
-is an unresolved stable-release blocker. The dependency checker reports the
-helper's TLS default, and strict qualification fails until the selected helper
-rejects that fixture. See the release guide; passing ordinary tests does not
-qualify this build as a stable release.
+Release builds require helpers that enable TLS verification by default. FFmpeg
+8.0.1 failed the nested certificate audit and is rejected by the release runtime
+guard. The pinned, patched FFmpeg 9.0.2 helper passed trusted private-CA HLS/DASH
+and AES-128 HLS downloads while rejecting wrong-host media segments and encryption
+keys. See [helper build and qualification](packaging/media-helper/README.md).
+Native macOS qualification and distribution verification remain required.
 
 ## Load the extension for development
 

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101a2d">
+    <meta name="description" content="A fast, private download manager for Linux and macOS.">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/app.css">
+    <title>LDM — Download Manager</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="LDM home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3.5v10m0 0 4-4m-4 4-4-4M5 15.5v2.25A2.25 2.25 0 0 0 7.25 20h9.5A2.25 2.25 0 0 0 19 17.75V15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-copy"><strong>LDM</strong><small>DOWNLOAD MANAGER</small></span>
+        </a>
+
+        <p class="nav-caption">LIBRARY</p>
+        <nav class="navigation" aria-label="Main navigation">
+          <button class="nav-item is-active" type="button" data-view="downloads" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5.5h14M5 12h14M5 18.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="3.5" cy="5.5" r=".8" fill="currentColor"/><circle cx="3.5" cy="12" r=".8" fill="currentColor"/><circle cx="3.5" cy="18.5" r=".8" fill="currentColor"/></svg>
+            <span>Downloads</span><span id="active-count" class="nav-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="history">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.2-5.7L3.5 8.5M3.5 4.5v4h4m4.5-1v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>History</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-note">
+          <span class="privacy-icon" aria-hidden="true">◈</span>
+          <div><strong>Private by design</strong><p>Downloads stay on your device.</p></div>
+        </div>
+        <div class="sidebar-footer">
+          <span id="engine-dot" class="engine-dot" aria-hidden="true"></span>
+          <span id="engine-label">Checking local engine…</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">YOUR DOWNLOAD SPACE</p>
+            <h1 id="view-title">Downloads</h1>
+          </div>
+          <div class="topbar-actions">
+            <span id="local-badge" class="local-badge" data-state="checking" role="status"
+              aria-label="Checking local engine" aria-live="polite">
+              <span class="local-badge-dot" aria-hidden="true"></span>
+              <span id="local-badge-label">CHECKING</span>
+            </span>
+            <button id="refresh" class="icon-button" type="button" aria-label="Refresh downloads" title="Refresh">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.7-3.8L4 9m0-4v4h4m-4 4a8 8 0 0 0 14.7 3.8L20 15m0 4v-4h-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <section id="download-view" class="view-panel" aria-label="Downloads">
+          <section class="composer-card" aria-labelledby="composer-title">
+            <div class="composer-heading">
+              <div class="composer-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5v10m0 0 4-4m-4 4-4-4M5 15.5v2.25A2.25 2.25 0 0 0 7.25 20h9.5A2.25 2.25 0 0 0 19 17.75V15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div><p class="composer-kicker">NEW TRANSFER</p><h2 id="composer-title">Download something great</h2><p class="composer-copy">Paste a media or file link and LDM will take it from here.</p></div>
+            </div>
+            <form id="download-form" class="download-form">
+              <label class="field-label" for="url-input">Download link</label>
+              <div class="url-field-wrap">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 13.5a4 4 0 0 0 5.66 0l3-3A4 4 0 0 0 13 4.84l-1.72 1.72m2.72 3.94a4 4 0 0 0-5.66 0l-3 3A4 4 0 0 0 11 19.16l1.72-1.72" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <input id="url-input" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com/video.mp4" required>
+                <button id="paste-button" class="paste-button" type="button">Paste</button>
+              </div>
+              <div class="link-type-row">
+                <label for="format-input">Link type</label>
+                <select id="format-input" name="format">
+                  <option value="auto">Detect from link</option>
+                  <option value="direct">Direct file</option>
+                  <option value="hls">HLS playlist</option>
+                  <option value="dash">DASH playlist</option>
+                </select>
+                <span>Choose HLS or DASH for playlist links without a file extension.</span>
+              </div>
+              <div class="form-bottom-row">
+                <div class="filename-field">
+                  <label class="field-label" for="filename-input">Save as <span>(optional)</span></label>
+                  <input id="filename-input" name="filename" type="text" autocomplete="off" placeholder="Use original file name">
+                </div>
+                <div class="filename-field folder-field">
+                  <label class="field-label" for="folder-input">Save folder <span>(optional)</span></label>
+                  <input id="folder-input" name="folder" type="text" autocomplete="off" placeholder="Default: Downloads" aria-describedby="folder-hint">
+                </div>
+                <button id="queue-button" class="primary-button" type="submit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 17v1.25A1.75 1.75 0 0 0 6.75 20h10.5A1.75 1.75 0 0 0 19 18.25V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Add to queue</span>
+                </button>
+              </div>
+              <p id="folder-hint" class="folder-hint">Use an absolute folder path, for example /home/you/Videos or /Users/you/Videos.</p>
+              <div id="manifest-options" hidden></div>
+              <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="overview-grid" aria-label="Download overview">
+            <article class="overview-card">
+              <div class="overview-icon icon-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17.5V20h16v-2.5M7 14l5 5 5-5M12 19V4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div><p class="overview-label">ACTIVE TRANSFERS</p><strong id="overview-active">0</strong></div>
+              <span class="overview-hint">up to 2 at once</span>
+            </article>
+            <article class="overview-card">
+              <div class="overview-icon icon-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5h16M4 12h11M4 17.5h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="16.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 14.8v1.9l1.2.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+              <div><p class="overview-label">WAITING IN QUEUE</p><strong id="overview-queued">0</strong></div>
+              <span class="overview-hint">ready when you are</span>
+            </article>
+            <article class="overview-card">
+              <div class="overview-icon icon-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.3 4.3L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/></svg></div>
+              <div><p class="overview-label">COMPLETED</p><strong id="overview-completed">0</strong></div>
+              <span class="overview-hint">saved in this browser</span>
+            </article>
+          </section>
+
+          <section class="transfer-section" aria-labelledby="transfer-heading">
+            <div class="section-heading">
+              <div><p class="eyebrow">MANAGE YOUR FILES</p><h2 id="transfer-heading">Active downloads</h2></div>
+              <button id="clear-history" class="quiet-button" type="button" disabled>Clear finished</button>
+            </div>
+            <div id="download-list" class="download-list">
+              <div class="empty-state">
+                <span class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 17v1.25A1.75 1.75 0 0 0 6.75 20h10.5A1.75 1.75 0 0 0 19 18.25V17" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <h3>Your queue is clear</h3><p>Add a link above to start your first download.</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="history-view" class="view-panel" aria-label="Download history" hidden>
+          <section class="history-intro">
+            <div><p class="eyebrow">YOUR RECENT ACTIVITY</p><h2>Download history</h2><p>Transfer details are saved only in this browser.</p></div>
+            <button id="clear-history-secondary" class="quiet-button" type="button" disabled>Clear finished</button>
+          </section>
+          <div id="history-list" class="download-list"></div>
+        </section>
+
+        <footer class="app-footer">
+          <span><span class="footer-lock" aria-hidden="true">◈</span> Requests go directly to your local LDM engine.</span>
+          <span id="app-version">LDM · 0.1.0</span>
+        </footer>
+      </main>
+    </div>
+    <script src="/transfer-metrics.js" defer></script>
+    <script src="/media-options.js" defer></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
