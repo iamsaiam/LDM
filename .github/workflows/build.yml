@@ -56,3 +56,39 @@ jobs:
           print('FAILURES',failures,flush=True)
           if failures: raise SystemExit(1)
           PY
+
+      - name: Private CA HTTPS preflight
+        if: always()
+        run: |
+          python3 -u - <<'PY'
+          import os,pathlib,subprocess,sys,tempfile,threading
+          sys.path.insert(0,str(pathlib.Path('cpp-engine/tests').resolve()))
+          import tls_download_test
+          from fixture_http import ThreadingHTTPServer
+          from http.server import SimpleHTTPRequestHandler
+          with tempfile.TemporaryDirectory() as directory:
+              root=pathlib.Path(directory)
+              authority,context=tls_download_test.make_certificate(root)
+              (root/'fixture.bin').write_bytes(b'LDM private certificate verification'*4096)
+              class Source(SimpleHTTPRequestHandler):
+                  def __init__(self,*a,**kw): super().__init__(*a,directory=str(root),**kw)
+                  def log_message(self,*a): pass
+              server=ThreadingHTTPServer(('127.0.0.1',0),Source)
+              server.socket=context.wrap_socket(server.socket,server_side=True)
+              threading.Thread(target=server.serve_forever,daemon=True).start()
+              try:
+                  env=os.environ.copy()
+                  env['LDM_CA_BUNDLE']=str(authority)
+                  env['NO_PROXY']=env['no_proxy']='localhost,127.0.0.1'
+                  url='https://localhost:'+str(server.server_port)+'/fixture.bin'
+                  curl=subprocess.check_output(['brew','--prefix','curl'],text=True).strip()+'/bin/curl'
+                  commands=[['openssl','version'],['openssl','verify','-CAfile',str(authority),str(root/'server.pem')],[curl,'-v','--cacert',str(authority),'--noproxy','*',url,'--output','/dev/null'],[str(pathlib.Path('build-release/LDM.app/Contents/MacOS/LDM').resolve()),url,str(root/'download.bin')]]
+                  for command in commands:
+                      result=subprocess.run(command,env=env,capture_output=True,text=True,timeout=15)
+                      print('COMMAND',command[0],result.returncode,result.stdout,result.stderr,flush=True)
+                      if result.returncode: raise SystemExit(result.returncode)
+                  assert (root/'download.bin').read_bytes()==(root/'fixture.bin').read_bytes()
+              finally:
+                  server.shutdown()
+                  server.server_close()
+          PY
