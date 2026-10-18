@@ -1,119 +1,58 @@
-name: Build and verify LDM
-
+name: Diagnose macOS transfers
 on:
   push:
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - '.vscode/**'
-      - '.github/ISSUE_TEMPLATE/**'
-  pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - '.vscode/**'
-      - '.github/ISSUE_TEMPLATE/**'
+    branches: ['diagnostics/macos-transfers']
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  native:
-    name: Native ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, macos-15, macos-15-intel]
-    defaults:
-      run:
-        shell: bash
+  transfers:
+    runs-on: macos-15
+    timeout-minutes: 8
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          node-version: '24'
-          package-manager-cache: false
-      - name: Linux dependencies
-        if: runner.os == 'Linux'
+      - name: Build native diagnostic executables
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libcurl4-openssl-dev ffmpeg pkg-config nasm libgnutls28-dev libx264-dev libmp3lame-dev libopus-dev libxml2-dev
-      - name: macOS dependencies
-        if: runner.os == 'macOS'
+          brew install cmake curl
+          export CURL_ROOT="$(brew --prefix curl)"
+          cmake -S cpp-engine -B build-release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+          cmake --build build-release --parallel 3
+          otool -L build-release/LDM.app/Contents/MacOS/LDM
+      - name: Bounded transfer checks with native process samples
         run: |
-          brew install cmake curl ffmpeg pkgconf nasm gnutls x264 lame opus libxml2
-          echo "PKG_CONFIG_PATH=$(brew --prefix libxml2)/lib/pkgconfig:${PKG_CONFIG_PATH:-}" >> "$GITHUB_ENV"
-          echo "CURL_ROOT=$(brew --prefix curl)" >> "$GITHUB_ENV"
-      - name: Build pinned media helper with inherited TLS trust
-        run: |
-          python3 scripts/build_media_helper.py --download --output-dir media-helper-build --jobs 3
-          echo "$GITHUB_WORKSPACE/media-helper-build/runtime/bin" >> "$GITHUB_PATH"
-      - name: Check prerequisites
-        run: python3 scripts/check_dependencies.py --json
-      - name: Configure native Release build
-        run: cmake -S cpp-engine -B build-release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DLDM_REQUIRE_VERIFIED_MEDIA_TLS=ON
-      - name: Compile
-        run: cmake --build build-release --parallel 3
-      - name: Engine and local HTTP checks
-        run: ctest --test-dir build-release --output-on-failure
-      - name: All browser and dashboard regression checks
-        run: node --test extension/tests/*.test.cjs desktop-ui/tests/*.test.cjs
-      - name: Execute a fresh native installation
-        env:
-          LDM_INSTALL_PREFIX: ${{ runner.temp }}/ldm-clean-install
-        run: python3 scripts/check_native_install.py --build-dir build-release --prefix "$LDM_INSTALL_PREFIX" --report install-evidence/native-install.json
-      - name: Strict media TLS qualification
-        env:
-          LDM_REQUIRE_VERIFIED_MEDIA_TLS: '1'
-        run: |
-          ctest --test-dir build-release --output-on-failure -R tls-download-trust
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path('media-helper-build/runtime/BUILD-INFO.json')
-          info = json.loads(path.read_text())
-          info['media_tls_qualified'] = True
-          info['qualified'] = True
-          path.write_text(json.dumps(info, indent=2) + '\n')
+          python3 -u - <<'PY'
+          import os, pathlib, signal, subprocess, sys
+          root = pathlib.Path.cwd()
+          build = root / 'build-release'
+          wrapper = "import faulthandler,runpy,sys; faulthandler.dump_traceback_later(12, repeat=True); sys.argv=sys.argv[1:]; runpy.run_path(sys.argv[0],run_name='__main__')"
+          cases = [('http_pause_test.py',build/'ldm-engine-features-driver'),('http_controls_inspection_test.py',build/'LDM.app/Contents/MacOS/LDM')]
+          failures = []
+          for name, binary in cases:
+              print('\nCASE',name,flush=True)
+              process = subprocess.Popen([sys.executable,'-u','-c',wrapper,str(root/'cpp-engine/tests'/name),str(binary)],start_new_session=True)
+              try:
+                  code = process.wait(timeout=28)
+                  if code: failures.append((name,code))
+              except subprocess.TimeoutExpired:
+                  listing = subprocess.check_output(['ps','-axo','pid=,command='],text=True)
+                  for line in listing.splitlines():
+                      fields = line.strip().split(None,1)
+                      if len(fields)!=2 or not fields[1].startswith(str(build)+'/'): continue
+                      pid = fields[0]
+                      output = pathlib.Path(os.environ['RUNNER_TEMP']) / ('ldm-sample-'+pid+'.txt')
+                      result = subprocess.run(['sample',pid,'1','-file',str(output)],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=10)
+                      print(result.stdout,flush=True)
+                      if output.exists(): print(output.read_text()[:45000],flush=True)
+                  failures.append((name,'timeout'))
+              finally:
+                  try: os.killpg(process.pid,signal.SIGKILL)
+                  except ProcessLookupError: pass
+                  process.wait()
+          print('FAILURES',failures,flush=True)
+          if failures: raise SystemExit(1)
           PY
-      - name: Small synthetic benchmark with hash checks
-        env:
-          RUNNER_OS_NAME: ${{ runner.os }}
-        run: |
-          ldm_binary=build-release/ldm-downloader
-          if [[ "$RUNNER_OS_NAME" == macOS ]]; then
-            ldm_binary=build-release/LDM.app/Contents/MacOS/LDM
-          fi
-          python3 benchmarks/local_http.py "$ldm_binary" --size-mib 16 --repetitions 1 --per-connection-mib 8 --output-dir benchmark-evidence
-      - name: Package development artifacts
-        run: python3 scripts/package_release.py --kind all --build-dir build-release --output-dir release-artifacts
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        with:
-          name: ldm-development-${{ matrix.os }}
-          path: |
-            release-artifacts/
-            benchmark-evidence/
-            install-evidence/
-            media-helper-build/runtime/BUILD-INFO.json
-            media-helper-build/runtime/bin/
-            media-helper-build/runtime/share/doc/ldm-media-helper/
-          if-no-files-found: error
-          retention-days: 14
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
-        if: failure()
-        with:
-          name: ldm-diagnostics-${{ matrix.os }}
-          path: |
-            build-release/Testing/Temporary/
-            media-helper-build/*.log
-            install-evidence/
-          if-no-files-found: ignore
-          retention-days: 7
