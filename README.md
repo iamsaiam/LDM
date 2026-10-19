@@ -1,6 +1,6 @@
 # LDM — Local Download Manager
 
-[![Build and verify](https://github.com/iamsaiam/LDM/actions/workflows/build.yml/badge.svg)](https://github.com/iamsaiam/LDM/actions/workflows/build.yml)
+[![Build and verify](https://github.com/iamsaiam/LDM/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/iamsaiam/LDM/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 An open-source download manager for **Linux and macOS**, with a native C++ engine,

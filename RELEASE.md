@@ -58,8 +58,9 @@ runtime trust guard enabled, runs CTest and all JavaScript regression files, che
 download hashes with a small local benchmark, stages a native install and uploads
 development artifacts with checksums. It has read-only repository permissions and
 does not publish a GitHub release, submit a browser extension, sign an app or use
-credentials. A workflow file is preparation; only a completed run proves that
-runner's result. This Linux workspace cannot verify native macOS execution.
+credentials. Completed native results and the exact source commit are recorded
+in [the verification record](docs/VERIFICATION.md). Repeat qualification for each
+release and preserve its native install report, helper metadata and checksums.
 
 For a Mac outside CI, run `python3 scripts/verify_macos.py --output-dir /absolute/path/to/new-evidence`
 with qualified helpers on `PATH`. It builds and runs native checks, validates
@@ -133,7 +134,8 @@ These install commands update the selected prefix; choose a fresh prefix to
 review an install without replacing an existing installation. The app is unsigned
 and unnotarized. Public macOS distribution still needs an Apple Developer signing
 identity, notarization and a clean-host installation check. No claim of successful
-Mac signing or native verification is made by this repository's local Linux run.
+Mac developer signing is made by the automated native CI checks. Interactive
+Finder/Gatekeeper behavior remains separate from the installed process checks.
 
 ## Load extension packages
 
@@ -190,8 +192,8 @@ temporary private CA and services, checks native HTTPS/FTPS trust/name rejection
 and requires wrong-host HLS/DASH segments and an AES-128 HLS key to be rejected.
 Trusted private-CA media must also download successfully. No system trust store
 is changed. FFmpeg 8.0.1 fails the nested check; the patched 9.0.2 helper passed
-these real local fixtures on Linux. Native Mac qualification still requires a run
-on each target architecture.
+these real local fixtures. Native CI repeats qualification on each release
+architecture; completed evidence is linked from the verification record.
 
 `LDM_REQUIRE_VERIFIED_MEDIA_TLS` defaults to `ON`. It checks both helpers' TLS
 defaults at runtime before media inspection and adds strict checks to CTest.

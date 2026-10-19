@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-10-18T19:27:02.815252+00:00",
+  "scope": "Caller-supplied remote HTTP(S) file; LDM configuration comparison only",
+  "maximum_bytes": 16777216,
+  "repetitions": 1,
+  "source": {
+    "content_length": 12040788,
+    "content_type": "application/x-xz",
+    "etag": "\"b7ba54-65bb8ae05f500\"",
+    "last_modified": "Fri, 18 Sep 2026 02:30:12 GMT",
+    "accept_ranges_header": "bytes",
+    "source_url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+    "query_omitted": false,
+    "range_probe_status": 206,
+    "range_probe_bytes_read": 1,
+    "range_probe_content_range": "bytes 0-0/12040788",
+    "range_verified": true
+  },
+  "executable_sha256": "15b16e788a3f0ad5c556f565cdbaa38bdf601110a9b7dad2e9c1205edb5f5c01",
+  "observed_sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+  "independent_sha256_provided": true,
+  "environment": {
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "architecture": "x86_64",
+    "python": "3.14.4",
+    "cpu_count": 4,
+    "proxy_environment_present": false
+  },
+  "competitor_measurement": false,
+  "trials": [
+    {
+      "connections": 1,
+      "repetition": 1,
+      "seconds": 6.7426459769994835,
+      "bytes": 12040788,
+      "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+      "correct": true,
+      "mib_per_second": 1.7030391783972285,
+      "range_probe_verified": true
+    },
+    {
+      "connections": 8,
+      "repetition": 1,
+      "seconds": 6.331119964997924,
+      "bytes": 12040788,
+      "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+      "correct": true,
+      "mib_per_second": 1.813737589617186,
+      "range_probe_verified": true
+    }
+  ],
+  "summary": [
+    {
+      "connections": 1,
+      "median_seconds": 6.7426459769994835,
+      "median_mib_per_second": 1.7030391783972285,
+      "all_correct": true
+    },
+    {
+      "connections": 8,
+      "median_seconds": 6.331119964997924,
+      "median_mib_per_second": 1.813737589617186,
+      "all_correct": true
+    }
+  ]
+}

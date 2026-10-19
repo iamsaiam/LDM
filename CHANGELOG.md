@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 — 2026-10-19
 
 ### Added
 
@@ -23,5 +23,8 @@
 - Locate the Homebrew LAME headers and library on Apple Silicon.
 - Give each libcurl shared-data category its own lock, preserving nested share
   and cookie locking on native libcurl versions.
+
+- Make loopback fixtures independent of reverse DNS and runner OpenSSL defaults.
+- Pace generated HTTP sources using elapsed time across operating systems.
 
 See [verification](docs/VERIFICATION.md) for the evidence behind release claims.

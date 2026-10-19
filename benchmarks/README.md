@@ -130,3 +130,26 @@ connection counts do not measure actual simultaneous sockets. A server that
 ignores ranges is reported as sequential fallback, with no multi-connection speed
 claim. Network/CDN conditions can change between runs. No IDM/XDM process or
 profile is used, so these measurements do not establish competitor superiority.
+
+
+## Recorded external HTTPS check
+
+On 2026-10-19 (Asia/Dhaka), the native Linux engine downloaded the official
+12,040,788-byte FFmpeg 9.0.2 source archive with TLS verification enabled.
+The size preflight and one-byte range probe passed. One trial requested one
+connection (6.743 seconds, 1.70 MiB/s); one requested eight connections
+(6.331 seconds, 1.81 MiB/s). Both matched the pinned official source SHA-256.
+
+See the [report](../docs/benchmarks/remote-ffmpeg-2026-10-19/REPORT.md) and
+[raw measurements](../docs/benchmarks/remote-ffmpeg-2026-10-19/results.json).
+These two trials verify the recorded downloads. Trial order and changing network
+conditions prevent a general parallel-speed conclusion. No competitor was measured.
+
+
+## Fixture revision 3
+
+The current loopback server starts without reverse DNS and sets TCP_NODELAY on
+accepted fixture connections. This keeps startup independent of runner DNS and
+avoids measuring small-write coalescing in the source server. New CI reports
+identify revision 3. The archived revision-2 results and their original hashes
+remain unchanged; comparisons must account for the fixture revision.

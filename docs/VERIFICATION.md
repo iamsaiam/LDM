@@ -8,11 +8,16 @@ latest build status.
 
 Repository: [iamsaiam/LDM](https://github.com/iamsaiam/LDM).
 
-| Platform | Completed evidence |
+| Platform | Current qualified build |
 | --- | --- |
-| Ubuntu 24.04 x86_64 | [Initial source run](https://github.com/iamsaiam/LDM/actions/runs/39136785945): 15/15 CTest groups, 38/38 JavaScript cases, fresh native install, strict media TLS qualification, hash-checked benchmark and packages passed |
-| Apple Silicon macOS 15 | Fix verification is running; no successful native result is claimed yet |
-| Intel macOS 15 | Fix verification is running; no successful native result is claimed yet |
+| Ubuntu 24.04 x86_64 | 15/15 CTest groups in 41.98 s; 38/38 JavaScript cases; native install, strict TLS, benchmark and packages passed |
+| Apple Silicon macOS 15 | 15/15 CTest groups in 44.36 s; 38/38 JavaScript cases; native install, strict TLS, benchmark and packages passed |
+| Intel macOS 15 | 15/15 CTest groups in 48.36 s; 38/38 JavaScript cases; native install, strict TLS, benchmark and packages passed |
+
+Current tested source: `7b09aa19841966253ce40c15207bb0ed3da85210`.
+[Qualification run 39216049220](https://github.com/iamsaiam/LDM/actions/runs/39216049220).
+The final source documentation commit is recorded separately in the bundle's
+`VERIFICATION.json`; documentation changes preserve the tested engine and UI code.
 
 The initial source commit is `02538a677f3edd1bf3327d084e84a864c8f0c1eb`.
 The first run exposed Apple C++ library support for `std::jthread` and a missing
@@ -20,6 +25,15 @@ Homebrew LAME include/library search path on Apple Silicon. Commit
 `c05d8ef4bb96da917adbff6f04da866ef3c48429` replaces the worker ownership with joined
 `std::thread` instances and supplies the Homebrew search path. Its follow-up run is
 [available here](https://github.com/iamsaiam/LDM/actions/runs/39157780133).
+That run passed Linux. Mac diagnostics later traced fixture stalls to reverse
+DNS during server startup and traced certificate failures to runner-specific
+OpenSSL defaults. Explicit fixture server names and certificate configuration
+resolved those setup dependencies. Fixture throttling now uses elapsed time to
+avoid accumulating operating-system sleep overshoot. Commit `e8bd06942e1ff804c64ef2908b8d4b7a006719ba`
+gives each libcurl shared-data kind a separate mutex, as required by the
+[libcurl callback API](https://curl.se/libcurl/c/CURLSHOPT_LOCKFUNC.html), and
+qualifies the Homebrew libcurl build on Mac using `CURL_ROOT`. Its native run is
+[39158652225](https://github.com/iamsaiam/LDM/actions/runs/39158652225).
 
 Native checks cover file reservation, job registry, HTTP reconnect/fallback,
 pause/resume/cancellation, media selection, progress backpressure, FTP, HTTPS/FTPS
@@ -81,8 +95,11 @@ matched their expected size and SHA-256. The corrected capped 32 MiB fixture had
 medians of 7.82 MiB/s (one connection) and 53.74 MiB/s (eight connections). The
 server capped each response independently, favoring parallel ranges.
 
-These are synthetic loopback measurements. No controlled Internet or IDM/XDM
-comparison has been completed.
+A separate [external HTTPS check](benchmarks/remote-ffmpeg-2026-10-19/REPORT.md)
+on 2026-10-19 downloaded FFmpeg's official 12,040,788-byte source archive with one
+and eight requested connections. Both matched the known source digest. The two
+single trials measured 1.70 and 1.81 MiB/s respectively. They identify one source
+and network at that time; no controlled IDM/XDM comparison has been completed.
 
 ## Distribution scope
 
