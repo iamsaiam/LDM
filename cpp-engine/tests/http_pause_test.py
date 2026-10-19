@@ -12,7 +12,7 @@ from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-from fixture_http import ThreadingHTTPServer
+from fixture_http import ThreadingHTTPServer, pace_transfer
 
 
 def wait_for(predicate, description, timeout=8):
@@ -58,11 +58,12 @@ def main():
                 start, end = int(begin), int(finish) if finish else end
             requests.append((self.path, header))
             self.metadata(206 if header and self.path == "/parallel.bin" else 200, start, end)
+            started = time.monotonic()
             try:
                 for offset in range(start, end + 1, len(block)):
                     self.wfile.write(block[: min(len(block), end - offset + 1)])
                     self.wfile.flush()
-                    time.sleep(0.02)
+                    pace_transfer(started, min(offset + len(block), end + 1) - start, len(block) / 0.02)
             except (BrokenPipeError, ConnectionResetError):
                 pass
 

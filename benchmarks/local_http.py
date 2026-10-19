@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from fixture_http import ThreadingHTTPServer
 
 MIB = 1024 * 1024
-FIXTURE_REVISION = 2
+FIXTURE_REVISION = 3
 
 
 class BenchmarkHTTPServer(ThreadingHTTPServer):

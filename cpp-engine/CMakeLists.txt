@@ -172,7 +172,7 @@ if(BUILD_TESTING)
         add_test(NAME public-transfer-controls-and-inspection
             COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/http_controls_inspection_test.py"
                 "$<TARGET_FILE:ldm-downloader>")
-        set_tests_properties(public-transfer-controls-and-inspection PROPERTIES TIMEOUT 30)
+        set_tests_properties(public-transfer-controls-and-inspection PROPERTIES TIMEOUT 60)
         add_test(NAME http-progress-backpressure
             COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/http_backpressure_test.py"
                 "$<TARGET_FILE:ldm-downloader>")

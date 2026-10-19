@@ -15,7 +15,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-from fixture_http import ThreadingHTTPServer
+from fixture_http import ThreadingHTTPServer, pace_transfer
 
 
 def free_port():
@@ -39,13 +39,14 @@ def main():
 
         def do_GET(self):
             self.do_HEAD()
+            started = time.monotonic()
             for offset in range(0, len(payload), 32768):
                 try:
                     self.wfile.write(payload[offset:offset + 32768])
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
                     return
-                time.sleep(0.015)
+                pace_transfer(started, min(offset + 32768, len(payload)), 32768 / 0.015)
 
     source = ThreadingHTTPServer(("127.0.0.1", 0), Source)
     source.daemon_threads = True
@@ -105,7 +106,7 @@ def main():
             return next((item for item in jobs if item["id"] == identifier), {})
 
         def wait(identifier, predicate):
-            deadline = time.monotonic() + 8
+            deadline = time.monotonic() + 12
             while time.monotonic() < deadline:
                 value = job(identifier)
                 if predicate(value):

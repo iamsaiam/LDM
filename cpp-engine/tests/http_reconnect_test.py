@@ -13,7 +13,7 @@ from socketserver import ThreadingMixIn
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-from fixture_http import HTTPServer
+from fixture_http import HTTPServer, pace_transfer
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
@@ -49,13 +49,14 @@ def main():
             self.send_header("Content-Length", str(len(payload)))
             self.send_header("Content-Type", "application/octet-stream")
             self.end_headers()
+            started = time.monotonic()
             for offset in range(0, len(payload), 32768):
                 try:
                     self.wfile.write(payload[offset:offset + 32768])
                     self.wfile.flush()
                 except (BrokenPipeError, ConnectionResetError):
                     return
-                time.sleep(0.012)
+                pace_transfer(started, min(offset + 32768, len(payload)), 32768 / 0.012)
 
     source = ThreadedHTTPServer(("127.0.0.1", 0), SourceHandler)
     source_thread = threading.Thread(target=source.serve_forever, daemon=True)
