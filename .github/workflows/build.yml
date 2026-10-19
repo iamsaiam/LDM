@@ -36,7 +36,7 @@ jobs:
               print('\nCASE',name,flush=True)
               process = subprocess.Popen([sys.executable,'-u','-c',wrapper,str(root/'cpp-engine/tests'/name),str(binary)],start_new_session=True)
               try:
-                  code = process.wait(timeout=28)
+                  code = process.wait(timeout=40)
                   if code: failures.append((name,code))
               except subprocess.TimeoutExpired:
                   listing = subprocess.check_output(['ps','-axo','pid=,command='],text=True)

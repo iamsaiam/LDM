@@ -87,6 +87,11 @@ def make_certificate(work):
     server_key = work / "server.key"
     request = work / "server.csr"
     certificate = work / "server.pem"
+    configuration = work / "authority.cnf"
+    configuration.write_text("[req]\nprompt=no\ndistinguished_name=dn\n"
+                             "[dn]\nCN=LDM isolated test CA\n"
+                             "[authority]\nbasicConstraints=critical,CA:TRUE\n"
+                             "keyUsage=critical,keyCertSign,cRLSign\nsubjectKeyIdentifier=hash\n")
     extensions = work / "extensions.cnf"
     extensions.write_text("subjectAltName=DNS:localhost\nbasicConstraints=critical,CA:FALSE\n"
                           "subjectKeyIdentifier=hash\nauthorityKeyIdentifier=keyid,issuer\n"
@@ -94,12 +99,12 @@ def make_certificate(work):
     commands = [
         ["openssl", "req", "-x509", "-sha256", "-newkey", "rsa:2048", "-nodes", "-days", "2",
          "-subj", "/CN=LDM isolated test CA", "-keyout", str(key), "-out", str(authority),
-         "-addext", "basicConstraints=critical,CA:TRUE",
-         "-addext", "keyUsage=critical,keyCertSign,cRLSign", "-addext", "subjectKeyIdentifier=hash"],
+         "-config", str(configuration), "-extensions", "authority"],
         ["openssl", "req", "-new", "-sha256", "-newkey", "rsa:2048", "-nodes", "-subj", "/CN=localhost",
-         "-keyout", str(server_key), "-out", str(request)],
+         "-keyout", str(server_key), "-out", str(request), "-config", str(configuration)],
         ["openssl", "x509", "-req", "-sha256", "-in", str(request), "-CA", str(authority), "-CAkey", str(key),
          "-CAcreateserial", "-out", str(certificate), "-days", "2", "-extfile", str(extensions)],
+        ["openssl", "verify", "-CAfile", str(authority), str(certificate)],
     ]
     for command in commands:
         subprocess.run(command, capture_output=True, text=True, check=True, timeout=15)

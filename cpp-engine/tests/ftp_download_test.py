@@ -19,7 +19,10 @@ import threading
 import time
 import urllib.request
 from pathlib import Path
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from fixture_http import ThreadingHTTPServer
 
 
 class PassiveFtpServer(socketserver.ThreadingTCPServer):
