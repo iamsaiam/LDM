@@ -9,9 +9,12 @@ import tempfile
 import threading
 import time
 import urllib.request
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from socketserver import ThreadingMixIn
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from fixture_http import HTTPServer
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

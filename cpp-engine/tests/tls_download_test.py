@@ -15,9 +15,12 @@ import tempfile
 import threading
 import time
 import urllib.request
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 
 from ftp_download_test import PassiveFtpHandler, unused_port
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from fixture_http import ThreadingHTTPServer
 
 
 class FtpsHandler(PassiveFtpHandler):
@@ -84,17 +87,24 @@ def make_certificate(work):
     server_key = work / "server.key"
     request = work / "server.csr"
     certificate = work / "server.pem"
+    configuration = work / "authority.cnf"
+    configuration.write_text("[req]\nprompt=no\ndistinguished_name=dn\n"
+                             "[dn]\nCN=LDM isolated test CA\n"
+                             "[authority]\nbasicConstraints=critical,CA:TRUE\n"
+                             "keyUsage=critical,keyCertSign,cRLSign\nsubjectKeyIdentifier=hash\n")
     extensions = work / "extensions.cnf"
-    extensions.write_text("subjectAltName=DNS:localhost\nbasicConstraints=CA:FALSE\n"
+    extensions.write_text("subjectAltName=DNS:localhost\nbasicConstraints=critical,CA:FALSE\n"
+                          "subjectKeyIdentifier=hash\nauthorityKeyIdentifier=keyid,issuer\n"
                           "keyUsage=digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\n")
     commands = [
-        ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
+        ["openssl", "req", "-x509", "-sha256", "-newkey", "rsa:2048", "-nodes", "-days", "2",
          "-subj", "/CN=LDM isolated test CA", "-keyout", str(key), "-out", str(authority),
-         "-addext", "basicConstraints=critical,CA:TRUE"],
-        ["openssl", "req", "-new", "-newkey", "rsa:2048", "-nodes", "-subj", "/CN=localhost",
-         "-keyout", str(server_key), "-out", str(request)],
-        ["openssl", "x509", "-req", "-in", str(request), "-CA", str(authority), "-CAkey", str(key),
+         "-config", str(configuration), "-extensions", "authority"],
+        ["openssl", "req", "-new", "-sha256", "-newkey", "rsa:2048", "-nodes", "-subj", "/CN=localhost",
+         "-keyout", str(server_key), "-out", str(request), "-config", str(configuration)],
+        ["openssl", "x509", "-req", "-sha256", "-in", str(request), "-CA", str(authority), "-CAkey", str(key),
          "-CAcreateserial", "-out", str(certificate), "-days", "2", "-extfile", str(extensions)],
+        ["openssl", "verify", "-CAfile", str(authority), str(certificate)],
     ]
     for command in commands:
         subprocess.run(command, capture_output=True, text=True, check=True, timeout=15)

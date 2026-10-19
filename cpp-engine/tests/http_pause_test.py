@@ -8,8 +8,11 @@ import sys
 import tempfile
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from fixture_http import ThreadingHTTPServer
 
 
 def wait_for(predicate, description, timeout=8):
@@ -79,7 +82,7 @@ def main():
                     return sum(path.stat().st_size for path in work.glob(output.name + ".part*") if path.is_file())
                 environment = os.environ.copy()
                 if name == "sequential":
-                    environment["LDM_TEST_TRANSFER_TIMEOUT"] = "2"
+                    environment["LDM_TEST_TRANSFER_TIMEOUT"] = "5"
                 with log_path.open("w") as log:
                     process = subprocess.Popen([driver, "download", f"http://127.0.0.1:{server.server_port}/{name}.bin",
                                                 str(output), "-", "-1", "-1", "0", "mp4", "4", str(control)],
@@ -91,9 +94,9 @@ def main():
                         time.sleep(0.25)
                         paused_bytes = partial_bytes()
                         transfer_requests = len(requests)
-                        # Sequential pause outlasts its two-second active transfer
+                        # Sequential pause outlasts its five-second active transfer
                         # deadline; the resumed transfer must still complete.
-                        time.sleep(2.2 if name == "sequential" else 0.65)
+                        time.sleep(5.2 if name == "sequential" else 0.65)
                         assert process.poll() is None and partial_bytes() == paused_bytes, f"{name} kept writing during pause"
                         control.write_text("resume")
                         wait_for(lambda: "control=resume" in log_text(), f"{name} did not receive resume")

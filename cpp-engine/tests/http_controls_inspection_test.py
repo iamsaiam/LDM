@@ -12,7 +12,10 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from fixture_http import ThreadingHTTPServer
 
 
 def free_port():

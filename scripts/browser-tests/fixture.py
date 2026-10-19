@@ -7,11 +7,15 @@ import re
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
 import urllib.request
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from fixture_http import ThreadingHTTPServer
 
 parser = argparse.ArgumentParser(description='Run generated localhost media and an isolated LDM engine for live extension checks.')
 parser.add_argument('--engine', type=Path, required=True)

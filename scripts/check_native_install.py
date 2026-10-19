@@ -13,7 +13,9 @@ import tempfile
 import threading
 import time
 import urllib.request
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from http.server import SimpleHTTPRequestHandler
+
+from fixture_http import ThreadingHTTPServer
 
 
 def main():

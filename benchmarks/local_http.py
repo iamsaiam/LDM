@@ -16,13 +16,17 @@ import shutil
 import socket
 import statistics
 import subprocess
+import sys
 import tempfile
 import threading
 import time
 import urllib.request
 from datetime import datetime, timezone
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from fixture_http import ThreadingHTTPServer
 
 MIB = 1024 * 1024
 FIXTURE_REVISION = 2
